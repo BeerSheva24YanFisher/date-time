@@ -15,7 +15,7 @@ public class PastTemporalProximity implements TemporalAdjuster {
     }
 
     private int compare(Temporal t1, Temporal t2) {
-        long range = t2.until(t1, ChronoUnit.DAYS);
+        long range = ChronoUnit.DAYS.between(t2,t1);
         return range > 0 ? 1 : range == 0 ? 0 : -1;
     }
 
