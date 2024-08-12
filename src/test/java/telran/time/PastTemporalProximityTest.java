@@ -29,11 +29,11 @@ public class PastTemporalProximityTest {
         assertEquals(expected, proximity.adjustInto(target));
 
         target = LocalDate.of(2023, 8, 8);
-        expected = LocalDateTime.of(2023, 8, 7, 10, 30);
+        expected = LocalDate.of(2023, 8, 7);
         assertEquals(expected, proximity.adjustInto(target));
 
         target = LocalDateTime.of(2023, 8, 7, 10, 30);
-        expected = LocalDate.of(2023, 8, 5);
+        expected = LocalDateTime.of(2023, 8, 5,0,0);
         assertEquals(expected, proximity.adjustInto(target));
 
         target = ZonedDateTime.of(2022, 8, 5, 9, 0, 0, 0, ZoneId.of("UTC"));

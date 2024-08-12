@@ -1,5 +1,7 @@
 package telran.time;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
@@ -17,7 +19,7 @@ public class PastTemporalProximity implements TemporalAdjuster {
         Arrays.sort(this.temporals, Comparator.comparingLong(this::toEpochSeconds));
     }
 
-    private long toEpochSeconds(Temporal temporal) {
+    public static ZonedDateTime toZonedDateTime(Temporal temporal) {
         int year = temporal.get(ChronoField.YEAR);
         int month = temporal.get(ChronoField.MONTH_OF_YEAR);
         int day = temporal.get(ChronoField.DAY_OF_MONTH);
@@ -26,7 +28,12 @@ public class PastTemporalProximity implements TemporalAdjuster {
         int second = temporal.isSupported(ChronoField.SECOND_OF_MINUTE) ? temporal.get(ChronoField.SECOND_OF_MINUTE) : 0;
         int nano = temporal.isSupported(ChronoField.NANO_OF_SECOND) ? temporal.get(ChronoField.NANO_OF_SECOND) : 0;
         ZoneId zoneId = temporal.query(TemporalQueries.zone()) != null ? temporal.query(TemporalQueries.zone()) : ZoneId.systemDefault();
-        return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId).toEpochSecond();
+        return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId);
+    }
+
+    private long toEpochSeconds(Temporal temporal) {
+        ZonedDateTime zonedDateTime = toZonedDateTime(temporal);
+        return zonedDateTime.toEpochSecond();
     }
 
     @Override
@@ -49,6 +56,22 @@ public class PastTemporalProximity implements TemporalAdjuster {
             }
         }
 
-        return nearestPast;
+        return nearestPast == null ? null : convertTo(toZonedDateTime(nearestPast), temporal);
     }
+
+    private Temporal convertTo(ZonedDateTime zonedDateTime, Temporal temporal) {
+        Temporal result;
+        if (temporal instanceof ZonedDateTime) {
+            result = zonedDateTime;
+        } else if (temporal instanceof LocalDateTime) {
+            result = zonedDateTime.toLocalDateTime();
+        } else if (temporal instanceof LocalDate) {
+            result = zonedDateTime.toLocalDate();
+        } else {
+            result = zonedDateTime.toOffsetDateTime();
+        }
+        return result;
+    }
+
+
 }
