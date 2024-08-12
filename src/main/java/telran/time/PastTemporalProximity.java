@@ -27,8 +27,7 @@ public class PastTemporalProximity implements TemporalAdjuster {
         int second = temporal.isSupported(ChronoField.SECOND_OF_MINUTE) ? temporal.get(ChronoField.SECOND_OF_MINUTE) : 0;
         int nano = temporal.isSupported(ChronoField.NANO_OF_SECOND) ? temporal.get(ChronoField.NANO_OF_SECOND) : 0;
         ZoneId zoneId = temporal.query(TemporalQueries.zone()) != null ? temporal.query(TemporalQueries.zone()) : ZoneId.systemDefault();
-        zonedDateTime = ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId);
-        return zonedDateTime.toEpochSecond();
+        return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId).toEpochSecond();
     }
 
     @Override
