@@ -19,7 +19,7 @@ public class PastTemporalProximity implements TemporalAdjuster {
         Arrays.sort(this.temporals, Comparator.comparingLong(this::toEpochSeconds));
     }
 
-    public static ZonedDateTime toZonedDateTime(Temporal temporal) {
+    private ZonedDateTime toZonedDateTime(Temporal temporal) {
         int year = temporal.get(ChronoField.YEAR);
         int month = temporal.get(ChronoField.MONTH_OF_YEAR);
         int day = temporal.get(ChronoField.DAY_OF_MONTH);
