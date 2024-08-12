@@ -18,7 +18,6 @@ public class PastTemporalProximity implements TemporalAdjuster {
     }
 
     private long toEpochSeconds(Temporal temporal) {
-        ZonedDateTime zonedDateTime;
         int year = temporal.get(ChronoField.YEAR);
         int month = temporal.get(ChronoField.MONTH_OF_YEAR);
         int day = temporal.get(ChronoField.DAY_OF_MONTH);
