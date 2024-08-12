@@ -1,67 +1,45 @@
 package telran.time;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class PastTemporalProximityTest {
-    private PastTemporalProximity proximity;
-
-    @BeforeEach
-    public void setUp() {
-    }
 
     @Test
-    public void testFindNearestPast() {
+    void testAdjustInto() {
         Temporal[] temporals = {
-            LocalDate.of(2023, 7, 15),
-            LocalDate.of(2023, 6, 1),
-            LocalDate.of(2023, 8, 1)
+                ZonedDateTime.of(2023, 8, 10, 15, 0, 0, 0, ZoneId.of("UTC")),
+                ZonedDateTime.of(2023, 8, 8, 15, 0, 0, 0, ZoneId.of("UTC")),
+                LocalDate.of(2023, 8, 5),
+                LocalDateTime.of(2023, 8, 7, 10, 30),
+                ZonedDateTime.of(2023, 8, 9, 9, 0, 0, 0, ZoneId.of("UTC"))
         };
-        proximity = new PastTemporalProximity(temporals);
-        Temporal target = LocalDate.of(2023, 7, 15);
 
-        Temporal result = proximity.adjustInto(target);
-        assertEquals(LocalDate.of(2023, 6, 1), result);
-    }
+        PastTemporalProximity proximity = new PastTemporalProximity(temporals);
 
-    @Test
-    public void testAllDatesInFuture() {
-        Temporal[] temporals = {
-            LocalDate.of(2024, 1, 1),
-            LocalDate.of(2024, 2, 1),
-            LocalDate.of(2024, 3, 1)
-        };
-        proximity = new PastTemporalProximity(temporals);
-        Temporal target = LocalDate.of(2023, 12, 31);
+        Temporal target = ZonedDateTime.of(2023, 8, 10, 15, 0, 0, 0, ZoneId.of("UTC"));
+        Temporal expected = ZonedDateTime.of(2023, 8, 9, 9, 0, 0, 0, ZoneId.of("UTC"));
+        assertEquals(expected, proximity.adjustInto(target));
 
-        Temporal result = proximity.adjustInto(target);
-        assertNull(result);
-    }
+        target = LocalDate.of(2023, 8, 8);
+        expected = LocalDateTime.of(2023, 8, 7, 10, 30);
+        assertEquals(expected, proximity.adjustInto(target));
 
-    @Test
-    public void testEmptyArray() {
-        Temporal[] temporals = {};
-        proximity = new PastTemporalProximity(temporals);
-        Temporal target = LocalDate.of(2023, 7, 15);
-        Temporal result = proximity.adjustInto(target);
-        assertNull(result);
-    }
+        target = LocalDateTime.of(2023, 8, 7, 10, 30);
+        expected = LocalDate.of(2023, 8, 5);
+        assertEquals(expected, proximity.adjustInto(target));
 
-    @Test
-    public void testDateEqualToTarget() {
-        Temporal[] temporals = {
-            LocalDate.of(2023, 7, 15),
-            LocalDate.of(2023, 6, 1)
-        };
-        proximity = new PastTemporalProximity(temporals);
-        Temporal target = LocalDate.of(2023, 7, 15);
+        target = ZonedDateTime.of(2022, 8, 5, 9, 0, 0, 0, ZoneId.of("UTC"));
+        assertNull(proximity.adjustInto(target));
 
-        Temporal result = proximity.adjustInto(target);
-        assertEquals(LocalDate.of(2023, 6, 1), result);
+        target = LocalDate.of(2023, 8, 5);
+        assertNull(proximity.adjustInto(target));
     }
 }
