@@ -1,22 +1,27 @@
 package telran.time;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjuster;
 import java.util.Arrays;
 
-public class PastTemporalProximity implements TemporalAdjuster {
+public class PastTemporalDateProximity implements TemporalAdjuster {
     private Temporal[] temporals;
 
-    public PastTemporalProximity(Temporal[] temporals) {
+    public PastTemporalDateProximity(Temporal[] temporals) {
         temporals = temporals.clone();
         Arrays.sort(temporals, this::compare);
         this.temporals = temporals;
     }
 
     private int compare(Temporal t1, Temporal t2) {
-        long range = ChronoUnit.DAYS.between(t2,t1);
+        long range = betweenDays(t2, t1);
         return range > 0 ? 1 : range == 0 ? 0 : -1;
+    }
+
+    private long betweenDays(Temporal from, Temporal to) {
+        return ChronoUnit.DAYS.between(LocalDate.from(from), LocalDate.from(to));
     }
 
     @Override
@@ -36,8 +41,10 @@ public class PastTemporalProximity implements TemporalAdjuster {
             }
         }
 
-        return nearestPast!=null ? temporal.plus(ChronoUnit.DAYS.between(temporal,nearestPast), ChronoUnit.DAYS) : nearestPast;
+        return nearestPast!=null ? temporal.plus(betweenDays(temporal,nearestPast), ChronoUnit.DAYS) : nearestPast;
     }
+
+
 
 
 }
